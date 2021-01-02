@@ -1,9 +1,9 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import {Nav, Navbar} from 'react-bootstrap';
+import {Button, Card, Nav, Navbar} from 'react-bootstrap';
 import './App.css';
-import {BrowserRouter, Link, Route, Switch} from 'react-router-dom';
-
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import logo from './test.jpg';
 /*
   @author: Priyank Lohariwal
 */
@@ -28,9 +28,53 @@ class Header extends React.Component {
 }
 
 class Home extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      products: null
+    }
+  }
+
+  componentDidMount() {
+    this.fetchProducts();
+  }
+
+  fetchProducts() {
+    fetch("http://localhost:8080/scamazon/home")
+      .then(res=> res.json())
+      .then(res => {
+        console.log(res);
+      },
+      (error) => {
+        console.log('Error fetching products: ', error)
+      })
+  }
+
   render() {
     return (
-      <h1>Home Page</h1>
+      <>
+        <ProductCard name="Shirt" currency="Rs. " price={500} />
+        <ProductCard name="Shirt" currency="Rs. " price={500} />
+      </>
+    );
+  }
+}
+
+class ProductCard extends React.Component {
+  render() {
+    return (
+      <Card style={{ width: '18rem' }}>
+        <Card.Img variant="top" src={logo} />
+      <Card.Body>
+        <Card.Title>{this.props.name}</Card.Title>
+        <Card.Text>
+          {this.props.currency} {this.props.price}
+        </Card.Text>
+        <Button variant="success">Add to Cart</Button>
+      </Card.Body>
+    </Card>
+
     );
   }
 }
