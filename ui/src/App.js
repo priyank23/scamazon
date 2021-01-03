@@ -1,9 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import {Badge, Button, Card, Nav, Navbar} from 'react-bootstrap';
+import {Badge, Button, Card, Col, Container, Nav, Navbar, OverlayTrigger, Row, Tooltip} from 'react-bootstrap';
 import './App.css';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import logo from './test.jpg';
 /*
   @author: Priyank Lohariwal
 */
@@ -11,7 +10,7 @@ import logo from './test.jpg';
 class Header extends React.Component {
   render() {
     return( 
-      <Navbar bg="dark" expand="xl" variant="dark">
+      <Navbar bg="dark" expand="xl" variant="dark" sticky="top">
         <Navbar.Brand href="/">Scamazon</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
@@ -35,6 +34,8 @@ class Home extends React.Component {
       products: [],
       deals: []
     }
+    // this.importAll = this.importAll.bind(this);
+    // this.images = this.importAll(require.context('./images', false, '/\.jpg/'));
   }
 
   componentDidMount() {
@@ -53,33 +54,65 @@ class Home extends React.Component {
       })
   }
 
+  // importAll(r) {
+  //   let images = {};
+  //   r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
+  //   return images;
+  // }
+
   render() {
     return (
       <>
-        <ul>
-        {console.log(this.state.deals)}
-        {this.state.deals.map((product, index) => 
-           <ProductCard key={index} product={product} />
+        <Container className="product-carousel">
+          <h1 className='home-header'>Top Picks</h1>
+          <Row>
+        {this.state.products.map((product, index) => 
+           <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product}/> </Col>
         )}
-        </ul>
+          </Row>
+        </Container>
+        <Container className="product-carousel">
+          <h1 className='home-header'>Deals of the day</h1>
+          <Row>
+        {this.state.deals.map((product, index) => 
+           <Col xs lg md xl sm><ProductCard key={index} product={product}/> </Col>
+        )}
+          </Row>
+        </Container>
       </>
     );
   }
 }
 
 class ProductCard extends React.Component {
+  constructor(props) {
+    super(props)
+    this.renderTooltip = this.renderTooltip.bind(this)
+  }
+  renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Add to wishlist
+    </Tooltip>
+  );
+
   render() {
     return (
-      <Card style={{ width: '15rem' }}>
-        <Card.Img variant="top" src={logo} />
+      <Card className="product-card">
+        <Card.Img variant="top" src={require(`./images/${this.props.product.type}.jpg`).default}/>
       <Card.Body>
         <Card.Title>
           <span className="left-wrapper">{this.props.product.name}</span>
-          <span className="right-wrapper"><Button variant="outline-dark" size="sm">+</Button></span> 
+          <span className="right-wrapper">
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 250, hide: 400 }}
+            overlay={this.renderTooltip}
+          >
+            <Button variant="outline-dark" size="sm">+</Button></OverlayTrigger></span> 
         </Card.Title>
         <Card.Subtitle className="mb-1 text-muted">{this.props.product.type}{' '}{this.props.product.isDeal?<Badge variant="primary">{this.props.product.discount}{'% off'}</Badge>: null}</Card.Subtitle>
         <Card.Text>
-          {'Rs.'}{(this.props.product.price*(1- this.props.product.discount*0.01)).toFixed(0)} <span className='ogPrice text-muted'>{this.props.product.price}</span>
+          {'Rs.'}{(this.props.product.price*(1- this.props.product.discount*0.01)).toFixed(0)} {this.props.product.isDeals?<span className='ogPrice text-muted'>{this.props.product.price}</span>:null}
         </Card.Text>
       </Card.Body>
     </Card>

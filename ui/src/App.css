@@ -50,3 +50,23 @@
 .ogPrice {
   text-decoration: line-through;
 }
+
+.product-card {
+  width: 12rem;
+  border-radius: 1rem;
+}
+
+.product-wrapper {
+  margin-bottom: 2vh;
+}
+
+.product-carousel {
+  margin: 0;
+  max-width: 100%;
+}
+
+.home-header {
+  margin-top: 1vh;
+  border-bottom: #323738 2px solid;
+  text-align: center;
+}
