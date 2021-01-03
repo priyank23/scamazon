@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.left-wrapper {
+  margin: 0px;
+  display: inline-block;
+}
+
+.right-wrapper {
+  margin: 0px;
+  float:right;
+}
+
+.ogPrice {
+  text-decoration: line-through;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import {Button, Card, Nav, Navbar} from 'react-bootstrap';
+import {Badge, Button, Card, Nav, Navbar} from 'react-bootstrap';
 import './App.css';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import logo from './test.jpg';
@@ -32,7 +32,8 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: null
+      products: [],
+      deals: []
     }
   }
 
@@ -44,18 +45,23 @@ class Home extends React.Component {
     fetch("http://localhost:8080/scamazon/home")
       .then(res=> res.json())
       .then(res => {
-        console.log(res);
+        this.setState({products : res.products, deals: res.deals})
+        console.log('[Home] Products fetched')
       },
       (error) => {
-        console.log('Error fetching products: ', error)
+        console.log('[Home] Error fetching products: ', error)
       })
   }
 
   render() {
     return (
       <>
-        <ProductCard name="Shirt" currency="Rs. " price={500} />
-        <ProductCard name="Shirt" currency="Rs. " price={500} />
+        <ul>
+        {console.log(this.state.deals)}
+        {this.state.deals.map((product, index) => 
+           <ProductCard key={index} product={product} />
+        )}
+        </ul>
       </>
     );
   }
@@ -64,14 +70,17 @@ class Home extends React.Component {
 class ProductCard extends React.Component {
   render() {
     return (
-      <Card style={{ width: '18rem' }}>
+      <Card style={{ width: '15rem' }}>
         <Card.Img variant="top" src={logo} />
       <Card.Body>
-        <Card.Title>{this.props.name}</Card.Title>
+        <Card.Title>
+          <span className="left-wrapper">{this.props.product.name}</span>
+          <span className="right-wrapper"><Button variant="outline-dark" size="sm">+</Button></span> 
+        </Card.Title>
+        <Card.Subtitle className="mb-1 text-muted">{this.props.product.type}{' '}{this.props.product.isDeal?<Badge variant="primary">{this.props.product.discount}{'% off'}</Badge>: null}</Card.Subtitle>
         <Card.Text>
-          {this.props.currency} {this.props.price}
+          {'Rs.'}{(this.props.product.price*(1- this.props.product.discount*0.01)).toFixed(0)} <span className='ogPrice text-muted'>{this.props.product.price}</span>
         </Card.Text>
-        <Button variant="success">Add to Cart</Button>
       </Card.Body>
     </Card>
 
