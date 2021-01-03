@@ -34,8 +34,6 @@ class Home extends React.Component {
       products: [],
       deals: []
     }
-    // this.importAll = this.importAll.bind(this);
-    // this.images = this.importAll(require.context('./images', false, '/\.jpg/'));
   }
 
   componentDidMount() {
@@ -53,12 +51,6 @@ class Home extends React.Component {
         console.log('[Home] Error fetching products: ', error)
       })
   }
-
-  // importAll(r) {
-  //   let images = {};
-  //   r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-  //   return images;
-  // }
 
   render() {
     return (
