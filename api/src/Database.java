@@ -22,4 +22,9 @@ public class Database {
 		Statement sta = conn.createStatement();
 		return sta.executeQuery(sql);
 	}
+
+	public int executeUpdate(String sql) throws SQLException {
+		Statement sta = conn.createStatement();
+		return sta.executeUpdate(sql);
+	}
 }
