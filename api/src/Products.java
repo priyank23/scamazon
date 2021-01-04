@@ -9,7 +9,7 @@ class Products {
             ResultSet resultSet = db.executeQuery("select * from (select * from products natural join products_category) as p left join discounts on p.product_id = discounts.id;");
             while (resultSet.next()){
                 Object discount = resultSet.getFloat("discount");
-                products.add(new Product(resultSet.getString("product_id"), resultSet.getString("name"), resultSet.getFloat("price"), resultSet.getString("type"), resultSet.getString("id") == null? false: true, discount == null? 0: (float)discount));
+                products.add(new Product(resultSet.getString("product_id"), resultSet.getString("name"), resultSet.getFloat("price"), resultSet.getString("type"), resultSet.getString("id") == null? false: true, discount == null? 0: (float)discount, resultSet.getString("imgSrc")));
             }
         } catch(Exception e) {
             e.printStackTrace();
