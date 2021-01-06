@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import { Badge, Button, Card, Col, Container, Nav, Navbar, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Container, Nav, Navbar, OverlayTrigger, Row, Tooltip} from 'react-bootstrap';
 import './App.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Cookies from "universal-cookie";
@@ -8,13 +8,12 @@ import Cookies from "universal-cookie";
   @author: Priyank Lohariwal
 */
 const cookies = new Cookies();
-cookies.remove('myCat')
 
 class Header extends React.Component {
   render() {
     return (
-      <Navbar bg="dark" expand="xl" variant="dark" sticky="top">
-        <Navbar.Brand href="/">Scamazon</Navbar.Brand>
+      <Navbar className="header" variant="dark" expand="xl" sticky="top">
+        <Navbar.Brand className="brandName" href="/">Scamazon</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ml-auto">
@@ -44,7 +43,7 @@ class Home extends React.Component {
   }
 
   fetchProducts() {
-    fetch("http://localhost:8080/scamazon/home")
+    fetch("http://localhost:8080/scamazon/home", {credentials: 'include'})
       .then(res => res.json())
       .then(res => {
         this.setState({ products: res.products, deals: res.deals })
@@ -59,18 +58,21 @@ class Home extends React.Component {
     return (
       <>
         <Container className="product-carousel">
-          <h1 className='home-header'>Top Picks</h1>
+          <h1 className='column-header'>Top Picks</h1>
+          <hr/>
           <Row>
             {this.state.products.map((product, index) =>
               <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
             )}
           </Row>
         </Container>
+        <hr/>
         <Container className="product-carousel">
-          <h1 className='home-header'>Deals of the day</h1>
+          <h1 className='column-header'>Deals of the day</h1>
+          <hr/>
           <Row>
             {this.state.deals.map((product, index) =>
-              <Col xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
+              <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
             )}
           </Row>
         </Container>
@@ -87,27 +89,19 @@ class ProductCard extends React.Component {
   }
 
   addProduct() {
-    let products = cookies.get('wishlist')
-    console.log(products)
-    if(!products) {
-      products.set('wishlist', [{id:this.props.product.id, quan: 1}])
-      return
-    }
-    let flag = false
-    for (var i = 0; i < products.length; i++) {
-      if (products[i].id === this.props.product.id) {
-        products[i].quan += 1
-        flag = true
-        break
-      }
-    }
-
-    if (!flag) {
-      products.push({ id: this.props.product.id, quan: 1 })
-    }
-
-    cookies.set('wishlist', products, {path: '/'})
-
+    fetch('http://localhost:8080/scamazon/updateWishlist', {
+      method: 'POST',
+      headers: {'content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({product: JSON.stringify(this.props.product), add: true}),
+    })
+    .then(response => response.json())
+    .then((result) => { 
+      console.log('[ProductCard] Product added to Bag')
+    },
+    (error) => {
+      console.log('[ProductCard] Error adding product: ', error)
+    })
   }
 
   renderTooltip = (props) => (
@@ -120,7 +114,7 @@ class ProductCard extends React.Component {
   render() {
     return (
       <Card className="product-card">
-        <Card.Img variant="top" src={this.props.product.imgSrc} />
+        <Card.Img src={this.props.product.imgSrc} />
         <Card.Body>
           <Card.Title>
             <span className="left-wrapper">{this.props.product.name}</span>
@@ -160,9 +154,129 @@ class SignupPage extends React.Component {
 }
 
 class Cart extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      products: []
+    }
+  }
+
+  componentDidMount() {
+    this.fetchBag();
+  }
+
+  fetchBag() {
+    fetch('http://localhost:8080/scamazon/bag', {credentials: 'include'})
+    .then(response => response.json())
+    .then((result) => { 
+      this.setState({products: result})
+    },
+    (error) => {
+      console.log('[CartProductCard] Error adding product: ', error)
+    })
+  }
   render() {
     return (
-      <pre>{console.log(cookies.getAll())}{JSON.stringify(cookies.get('wishlist'))}</pre>
+      <>
+        <h1 className="column-header">Bag</h1>
+        <hr />
+        <Container>
+          {this.state.products.map((product, index) => (
+            <Row>
+              <Col xs lg md xl sm>
+                <CartProductCard product={product.product} quantity={product.quantity} />
+              </Col>
+            </Row>
+            ))
+          }
+          
+        </Container>
+      </>
+    )
+  }
+  
+}
+
+class CartProductCard extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      product: {},
+      quantity: 0
+    }
+    this.addProduct = this.addProduct.bind(this)
+    this.removeProduct = this.removeProduct.bind(this)
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    return {product: props.product, quantity: props.quantity}
+  }
+
+  addProduct() {
+    const options = {
+      'method': 'POST',
+      'headers': {'Content-Type': 'application/json'},
+      'credentials': 'include',
+      'body': JSON.stringify({'product': JSON.stringify(this.state.product), 'add': true})
+    }
+
+    fetch('http://localhost:8080/scamazon/updateWishlist', options)
+      .then((response) => response.json())
+      .then((result) => { 
+        console.log('[CartProductCard] Product added to Bag' + result)
+        this.setState({
+          product: this.state.product, 
+          quantity: (this.state.quantity + 1)
+        })
+      },
+      (error) => {
+        console.log('[CartProductCard] Error adding product: ', error)
+      })
+  }
+
+  removeProduct (){
+    if(this.state.quantity === 0) return
+    fetch('http://localhost:8080/scamazon/updateWishlist', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({product: JSON.stringify(this.state.product), add: false})
+    })
+    .then(response => response.json())
+    .then((result) => { 
+      console.log('[ProductCard] Product removed from Bag')
+      this.setState({
+        product: this.state.product, 
+        quantity: (this.state.quantity - 1)
+      })
+    },
+    (error) => {
+      console.log('[ProductCard] Error adding product: ', error)
+    })
+  }
+
+  render() {
+    return (
+      <Card className="cart-product-card">
+        <Card.Img style={{width: "auto"}} src={this.state.product.imgSrc} />
+        <Card.Body>
+          <Card.Title>
+            <span className="left-wrapper">{this.state.product.name}</span>
+            <span className="right-wrapper">
+              <ButtonGroup size="lg">
+                <Button onClick={this.addProduct}>+</Button>
+                <Button disabled>{this.state.quantity}</Button>
+                <Button onClick={this.removeProduct}>-</Button>
+              </ButtonGroup>
+            </span>
+          </Card.Title>
+          <Card.Subtitle className="mb-1 text-muted">{this.state.product.type}{' '}{this.state.product.isDeal ? <Badge variant="primary">{this.state.product.discount}{'% off'}</Badge> : null}</Card.Subtitle>
+          <Card.Text>
+            {'Rs.'}{(this.state.product.price * (1 - this.state.product.discount * 0.01)).toFixed(0)} {this.state.product.isDeal ? <span className='ogPrice text-muted'>{this.state.product.price}</span> : null}
+          </Card.Text>
+        </Card.Body>
+      </Card>
     );
   }
 }

@@ -1,27 +1,26 @@
 import javax.servlet.*;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 import java.sql.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
-@WebServlet(value={"/home"})
-public class Home extends HttpServlet {
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+@WebServlet(value={"/updateWishlist"})
+public class ProductHandler extends HttpServlet {
+    public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.setHeader("Access-Control-Allow-Credentials", "true");
-        
         PrintWriter out = res.getWriter();
-        Database db = (Database) getServletContext().getAttribute("db");
-        JSONParser parser  = new JSONParser();
 
+        Database db = (Database) getServletContext().getAttribute("db");
+
+        String query=req.getReader().lines().collect(Collectors.joining());
         String username = null;
         String password = null;
-        JSONArray wishlist = new JSONArray();
-    
         Cookie[] cookies = req.getCookies();
         if(cookies != null) {
             for(int i=0;i<cookies.length; i++) {
@@ -41,20 +40,21 @@ public class Home extends HttpServlet {
             res.addCookie(passCookie);
         }
 
-        ArrayList<Product> products = (new Products(db)).getProducts();
+		JSONParser parser = new JSONParser();
+		JSONObject obj = new JSONObject();
+        JSONObject product = new JSONObject();
+
+		try {
+			obj = (JSONObject)parser.parse(query);
+            product = (JSONObject)parser.parse((String)obj.get("product"));
+		} catch(ParseException e) {}
+
+        boolean add = (boolean)obj.get("add");
         
-        JSONObject productList = new JSONObject();
-        JSONArray pr = new JSONArray();
-        JSONArray deals = new JSONArray();
 
-        for(int i=0;i<products.size();i++) {
-            if(products.get(i).isDiscounted()) deals.add(products.get(i).getJson());
-            else pr.add(products.get(i).getJson());
-        }
-
-        productList.put("products", pr);
-        productList.put("deals", deals);
-
-        out.print(JSONValue.toJSONString(productList));
+        Wishlist wishlist = new Wishlist(username, db);
+        if(add) wishlist.add(product);
+        else wishlist.remove(product);
+        out.print("{\"status\": \"ok\"}");
     }
 }
