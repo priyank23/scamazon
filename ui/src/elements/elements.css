@@ -21,6 +21,7 @@
 
 .ogPrice {
   text-decoration: line-through;
+  font-size: 0.8rem;
 }
 
 .product-card {
