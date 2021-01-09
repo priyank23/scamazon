@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Fredericka+the+Great&display=swap');
 
 .header {
-  background-color: #ee6693;
+  /* background-image: url(https://images.unsplash.com/photo-1530305408560-82d13781b33a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1352&q=80); */
+  background-color: #040027;
 }
 
 .brandName {
@@ -66,4 +67,32 @@
   margin-top: 10px;
   text-align: center; 
   text-shadow: 0 1px 1px #fff; 
+}
+
+.profile-head {
+  transform: translateY(5rem)
+}
+
+.cover {
+  background-image: url(https://images.unsplash.com/photo-1530305408560-82d13781b33a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1352&q=80);
+  background-size: cover;
+  background-repeat: no-repeat
+}
+
+.signInCard {
+  border: #040027 2px solid;
+  width: 20rem;
+  border-radius: 0.5rem;
+}
+
+.input-group {
+  background: #040027 !important;
+  color: white !important;
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.signInBtn {
+  width: 70%;
+  background-color: #040027;
+  border: #040027 1px solid;
 }
