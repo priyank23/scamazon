@@ -44,7 +44,7 @@ class Home extends React.Component {
             <hr/>
             <Row>
               {this.state.deals.map((product, index) =>
-                <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
+                <Col className="product-wrapper" key={index} xs lg md xl sm><ProductCard product={product} /> </Col>
               )}
             </Row>
           </Container>
@@ -54,7 +54,7 @@ class Home extends React.Component {
             <hr/>
             <Row>
               {this.state.products.map((product, index) =>
-                <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
+                <Col className="product-wrapper" key={index} xs lg md xl sm><ProductCard product={product} /> </Col>
               )}
             </Row>
           </Container>
@@ -66,7 +66,7 @@ class Home extends React.Component {
               <hr/>
               <Row>
                 {this.state.products.map((product, index) =>
-                  <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
+                  <Col className="product-wrapper" key={index} xs lg md xl sm><ProductCard product={product} /> </Col>
                 )}
               </Row>
             </Container>
@@ -76,7 +76,7 @@ class Home extends React.Component {
               <hr/>
               <Row>
                 {this.state.deals.map((product, index) =>
-                  <Col className="product-wrapper" xs lg md xl sm><ProductCard key={index} product={product} /> </Col>
+                  <Col className="product-wrapper" key={index} xs lg md xl sm><ProductCard product={product} /> </Col>
                 )}
               </Row>
             </Container>

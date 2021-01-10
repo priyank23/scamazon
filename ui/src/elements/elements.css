@@ -83,12 +83,15 @@
   border: #040027 2px solid;
   width: 20rem;
   border-radius: 0.5rem;
+  box-shadow: 3px 3px 3px rgb(110, 103, 103);
+  background-color: #b8babb;
 }
 
 .input-group {
   background: #040027 !important;
   color: white !important;
   border-radius: 0.25rem 0 0 0.25rem;
+  border: 1px #040027 solid;
 }
 
 .signInBtn {
