@@ -27,15 +27,15 @@ class CartProductCard extends React.Component {
   render() {
     return (
       <Card className="cart-product-card">
-        <Card.Img style={{width: "auto"}} src={this.props.product.imgSrc} />
+        <Card.Img style={{width: "130px"}} src={this.props.product.imgSrc} />
         <Card.Body>
           <Card.Title>
             <span className="left-wrapper">{this.props.product.name}</span>
             <span className="right-wrapper">
-              <ButtonGroup size="lg">
-                <Button onClick={this.addProduct}>+</Button>
-                <Button disabled>{this.props.quantity}</Button>
-                <Button onClick={this.removeProduct}>-</Button>
+              <ButtonGroup size="sm">
+                <Button variant="dark" onClick={this.addProduct}>+</Button>
+                <Button variant="dark" disabled>{this.props.quantity}</Button>
+                <Button variant="dark" onClick={this.removeProduct}>-</Button>
               </ButtonGroup>
             </span>
           </Card.Title>

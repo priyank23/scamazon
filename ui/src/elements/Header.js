@@ -18,6 +18,15 @@ class Header extends React.Component {
 
     signOut() {
       console.log('signing out')
+      fetch('http://localhost:8080/scamazon/signout', {
+            method: 'POST',
+            headers: {'content-Type': 'text/plain'},
+            credentials: 'include',
+            body: "",
+        }).then(res => res.json())
+        .then(result=> {
+            if(result.signedOut) window.location = 'http://localhost:3000/'
+        })
     }
     render() {
       return (
@@ -29,7 +38,7 @@ class Header extends React.Component {
               <Nav.Link href="/"><FontAwesomeIcon icon={faHome}/></Nav.Link>
               <Nav.Link href="/profile"><FontAwesomeIcon icon={faUserCircle}/></Nav.Link>
               <Nav.Link href="/cart"><FontAwesomeIcon icon={faShoppingBag}/></Nav.Link>
-              {cookie.get('username') === '__dummy'?
+              {typeof cookie.get('username') === 'undefined'?
                 <Nav.Link href="/sign-in"><FontAwesomeIcon href="/sign-in" icon={faSignInAlt} /></Nav.Link>: 
                 <Nav.Link><FontAwesomeIcon icon={faSignOutAlt} onClick={this.signOut} /></Nav.Link>}
             </Nav>

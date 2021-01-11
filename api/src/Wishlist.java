@@ -52,13 +52,22 @@ class Wishlist {
 
     void add(JSONObject product) {
         try{
-            ResultSet rs = db.executeQuery("Select * from users_wishlist where username = \"" + this.username+"\"" + "and product_id = \"" + (String)product.get("id") + "\"" );
+            ResultSet rs = db.executeQuery("Select * from users_wishlist where username = \"" + this.username+"\" and product_id = \"" + (String)product.get("id") + "\"" );
             if(!rs.isBeforeFirst()) {
                 int r = db.executeUpdate("INSERT into users_wishlist values(\""+ this.username + "\", \"" + (String)product.get("id") + "\", 1)");
             }
             while(rs.next()) {
                 int r = db.executeUpdate("UPDATE users_wishlist set quantity = " + Integer.toString(rs.getInt("quantity")+1) + " where username = \"" + this.username+"\"" + "and product_id = \"" + (String)product.get("id") + "\"" );
             }
+
+            rs = db.executeQuery("SELECT * from user_preferences where username = \"" + this.username + "\" and product_type = \""+ (String)product.get("type") + "\" and isDeal = " + (boolean)product.get("isDeal"));
+            if(!rs.isBeforeFirst()) {
+                int r = db.executeUpdate("INSERT into user_preferences values(\"" + this.username + "\", \"" + (String)product.get("type") + "\", 1, " + (boolean)product.get("isDeal") + ");");
+            }
+            while(rs.next()) {
+                int r = db.executeUpdate("UPDATE user_preferences set accesses = " + Integer.toString(rs.getInt("accesses")+1) + " whre username = \"" + this.username + "\" and product_type = \"" + (String)product.get("type") + "\"");
+            }
+
         } catch(Exception e) {
             e.printStackTrace();
         }

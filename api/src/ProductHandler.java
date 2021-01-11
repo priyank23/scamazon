@@ -1,6 +1,5 @@
 import javax.servlet.*;
 import java.io.*;
-import java.util.*;
 import java.util.stream.Collectors;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
@@ -20,27 +19,14 @@ public class ProductHandler extends HttpServlet {
 
         String query=req.getReader().lines().collect(Collectors.joining());
         String username = null;
-        String password = null;
         Cookie[] cookies = req.getCookies();
         if(cookies != null) {
             for(int i=0;i<cookies.length; i++) {
                 if(cookies[i].getName().equals("username")) username = (String) cookies[i].getValue();
-                if(cookies[i].getName().equals("password")) password = (String) cookies[i].getValue();
             }
         }
 
-        if(username == null) {
-            username = "__dummy";
-            password = "";
-            Cookie userCookie = new Cookie("username", username);
-            Cookie passCookie = new Cookie("password", password);
-            userCookie.setPath("/");
-            passCookie.setPath("/");
-            res.addCookie(userCookie);
-            res.addCookie(passCookie);
-        }
-
-		JSONParser parser = new JSONParser();
+        JSONParser parser = new JSONParser();
 		JSONObject obj = new JSONObject();
         JSONObject product = new JSONObject();
 
@@ -50,11 +36,45 @@ public class ProductHandler extends HttpServlet {
 		} catch(ParseException e) {}
 
         boolean add = (boolean)obj.get("add");
-        
 
-        Wishlist wishlist = new Wishlist(username, db);
-        if(add) wishlist.add(product);
-        else wishlist.remove(product);
+        if(username == null) {
+            HttpSession httpSession = req.getSession(false);
+            if(httpSession != null) {
+                JSONArray arr = new JSONArray();
+                try {
+                    arr = (JSONArray)parser.parse((String)httpSession.getAttribute("bag"));
+                } catch(ParseException e) {}
+
+                boolean updated = false;
+                for(int i=0;i<arr.size();i++) {
+                    if(((String)((JSONObject)((JSONObject)arr.get(i)).get("product")).get("id")).equals((String)product.get("id"))) {
+                        if(add) ((JSONObject)arr.get(i)).put("quantity", (long)((JSONObject)arr.get(i)).get("quantity") + 1);
+                        else ((JSONObject)arr.get(i)).put("quantity", (long)((JSONObject)arr.get(i)).get("quantity") - 1);
+                        updated = true;
+                    }
+                }
+                if(!updated && add) {
+                    JSONObject pr=new JSONObject(), toSend = new JSONObject(); 
+
+                    pr.put("id", (String)product.get("id"));
+                    pr.put("name", (String)product.get("name"));
+                    pr.put("price", (long)product.get("price"));
+                    pr.put("type", (String)product.get("type"));
+                    pr.put("isDeal", (boolean)product.get("isDeal"));
+                    pr.put("discount", (long)product.get("discount"));
+                    pr.put("imgSrc", (String)product.get("imgSrc"));
+
+                    toSend.put("product", pr);
+                    toSend.put("quantity", 1);
+                    arr.add(toSend);
+                }
+                httpSession.setAttribute("bag", JSONValue.toJSONString(arr));   
+            }
+        } else {
+            Wishlist wishlist = new Wishlist(username, db);
+            if(add) wishlist.add(product);
+            else wishlist.remove(product);
+        }
         out.print("{\"status\": \"ok\"}");
     }
 }

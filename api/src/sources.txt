@@ -1,9 +1,12 @@
 ./Database.java
 ./Products.java
 ./Bag.java
+./Profile.java
+./SignoutHandler.java
 ./Wishlist.java
-./Users.java
+./LoginHandler.java
 ./DatabaseInsert.java
+./SignupHandler.java
 ./User.java
 ./Home.java
 ./DatabaseListener.java
